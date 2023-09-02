@@ -6,66 +6,42 @@ router.get('/', (req, res) => {
   return res.render('index')
 })
 
-router.get('/productList', (req, res) => {
-  let products = []
-  Product
-    .findAll({raw: true})
-    .then(ps => {
-      products = ps
-    })
-
+router.get('/productList', async (req, res) => {
+  let products = await Product.findAll({raw: true})
   res.render('productList', {products})
 })
+//
+// router.get('/customerList', async (req, res) => {
+//   let customers = await Customer.findAll({raw: true})
+//   let products = await Product.findAll({raw: true})
+//
+//   customers = customers.map(customer => {
+//     let favoriteProduct = products.find(product => customer.favoriteId === product.id)
+//     customer.productName = favoriteProduct.name
+//     return customer
+//   })
+//
+//   //模擬其他資料邏輯處理
+//   await saveUserLog()
+//
+//   res.render('customerList', { customers })
+// })
 
-router.get('/customerList', (req, res) => {
-  Customer
-    .findAll({raw: true})
-    .then(customers => {
-      customers.forEach(customer => {
-        Product
-          .findByPk(customer.favoriteId, {raw: true})
-          .then(product => {
-            customer.productName = product.name
-          })
-      })
 
-      //模擬其他資料邏輯處理
-      saveUserLog()
-        .then(() => {
-          res.render('customerList', {customers})
-        })
-    })
+//case 2
+router.get('/customerList', async (req, res) => {
+  let customers = await Customer.findAll({raw: true})
+
+  for (const customer of customers) {
+    let favoriteProduct = await Product.findByPk(customer.favoriteId, {raw: true})
+    customer.productName = favoriteProduct.name
+  }
+
+  //模擬其他資料邏輯處理
+  await saveUserLog()
+
+  res.render('customerList', {customers})
 })
-
-//correct
-// router.get('/productList', (req, res) => {
-//   Product
-//     .findAll({raw: true})
-//     .then(products => {
-//       res.render('productList', { products })
-//     })
-// })
-//
-// router.get('/customerList', (req, res) => {
-//   Customer
-//     .findAll({raw: true})
-//     .then(customers => {
-//       Product
-//         .findAll({raw: true})
-//         .then(products => {
-//           customers.forEach(customer => {
-//             let favoriteProduct = products.find(product => customer.favoriteId === product.id)
-//             customer.productName = favoriteProduct.name
-//           })
-//
-//           //模擬其他資料邏輯處理
-//           saveUserLog()
-//             .then(() => {
-//               res.render('customerList', { customers })
-//             })
-//         })
-//     })
-// })
 
 
 function saveUserLog() {
