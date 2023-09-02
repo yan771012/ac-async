@@ -54,7 +54,7 @@ router.get('/customerList', (req, res) => {
 //         .findAll({raw: true})
 //         .then(products => {
 //           customers.forEach(customer => {
-//             let favoriteProduct = products.find(product => customer.favoriteId === product.id)
+//             const favoriteProduct = products.find(product => customer.favoriteId === product.id)
 //             customer.productName = favoriteProduct.name
 //           })
 //
